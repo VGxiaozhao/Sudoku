@@ -51,23 +51,31 @@ class Sudoku:
         _dfs(0)
         return board
 
-    def run(self):
+    def run(self, draw_num=False, draw_answer=False):
+        """
+
+        :param draw_num: 是否绘制cnn识别的数字结果
+        :param draw_answer: 是否绘制解
+        :return: 第一个元素为9x9的list，表示数独的解，出错返回带有0
+                 第二个为绘制后的图片，格式为numpy.ndarray
+        """
         gray = self.loc.gray
         board, points, ids = self.loc.location()
         num, proba = self.classify(gray, points)
         img = self.loc.img
 
-        for point, x in zip(points, num):
-            cv2.putText(img, str(int(x)), (point[0], point[1] + point[3]), 0, 2.5, (0, 255, 0), thickness=3)
+        if draw_num:
+            for point, x in zip(points, num):
+                cv2.putText(img, str(int(x)), (point[0], point[1] + point[3]), 0, 2.5, (0, 255, 0), thickness=3)
         ans_board = self.solve(ids, num)
-        print(ans_board)
-        ox, oy, ow, oh = board
-        for x in range(9):
-            for y in range(9):
-                if (x, y) not in ids and ans_board[x][y]:
-                    cv2.putText(img, str(ans_board[x][y]), (ox+y*oh//9, oy+(x+1)*ow//9), 0, 2.5, (255, 0, 0), thickness=3)
-        plt.imshow(img)
-        plt.show()
+        if draw_answer:
+            ox, oy, ow, oh = board
+            for x in range(9):
+                for y in range(9):
+                    if (x, y) not in ids and ans_board[x][y]:
+                        cv2.putText(img, str(ans_board[x][y]), (ox+y*oh//9, oy+(x+1)*ow//9),
+                                    0, 2.5, (255, 0, 0), thickness=3)
+        return ans_board, img
 
     def classify(self, gray, points):
         src_girds, girds = [], []
@@ -97,8 +105,8 @@ if __name__ == '__main__':
         for name in os.listdir('image'):
             print(name)
             a = Sudoku(f'image/{name}')
-            a.run()
-        a = Sudoku("image/s4.png")
-        a.run()
-
+            ans, img = a.run(True, True)
+            print(ans)
+            plt.imshow(img)
+            plt.show()
     main()
