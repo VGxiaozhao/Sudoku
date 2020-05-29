@@ -1,11 +1,8 @@
-import time
 import os
+
 import cv2
-import numpy as np
 import matplotlib.pyplot as plt
-from functools import cmp_to_key
-from config import Config
-import queue
+import numpy as np
 
 
 def find_board(src_img: np.ndarray):
@@ -30,26 +27,28 @@ def find_board(src_img: np.ndarray):
 
 
 def _delete_line(img: np.ndarray):
-    q = queue.Queue()
+    q = []
     for x in range(img.shape[0]):
         for y in range(img.shape[1]):
             if img[x][y]:
-                q.put_nowait((x, y))
+                q.append((x, y))
                 break
-        if not q.empty():
+        if q:
             break
-    while not q.empty():
-        x, y = q.get_nowait()
+    i = 0
+    while i < len(q):
+        x, y = q[i]
+        i = i+1
         if img[x][y]:
             img[x][y] = 0
-            if x+1 < img.shape[0]:
-                q.put_nowait((x+1, y))
-            if y+1 < img.shape[1]:
-                q.put_nowait((x, y+1))
-            if x-1 >= 0:
-                q.put_nowait((x-1, y))
-            if y-1 >= 0:
-                q.put_nowait((x, y-1))
+            if x+1 < img.shape[0] and img[x+1][y]:
+                q.append((x+1, y))
+            if y+1 < img.shape[1] and img[x][y+1]:
+                q.append((x, y+1))
+            if x-1 >= 0 and img[x-1][y]:
+                q.append((x-1, y))
+            if y-1 >= 0 and img[x][y-1]:
+                q.append((x, y-1))
 
 
 def extract_num(src_img: np.ndarray, board: tuple):
@@ -87,6 +86,7 @@ class ImgLocation:
 
     def location(self):
         board = find_board(self.img)
+        assert board != (0, 0, 0, 0), "find puzzle error"
         num_list = extract_num(self.img, board)
         ids = get_index(board, num_list)
         return board, num_list, ids
