@@ -8,7 +8,7 @@
 ## 数字提取  
 确定框位置：通过opencv findContours找到所有轮廓后，使用arcLength 和 approxPolyDP找到最大的顶角数为4的轮廓即为数独框的位置。  
 提取数字位置：这一步比较直接，通过广度搜索将边框线清除，清除完毕之后调用findContours 就能直接得到各个数字的位置了，效果如下。  
-![alt 数字提取效果](http://www.srzzc.cn/github_number_extract.png)  
+![alt 数字提取效果](./readme_img/github_number_extract.png)  
 
 ## 数字识别  
 这一步比较容易实现，毕竟很多人学习神经网络的第一个项目就是识别mnist手写数字识别。  
@@ -41,4 +41,4 @@ putText(img, text, org, fontFace, fontScale, color[, thickness[, lineType[, bott
 cnn使用AlexNet实现，实际在训练时验证准确率约99.5左右
 
 最终运行效果:  
-![alt 运行效果](http://www.srzzc.cn/github_number_result.png)
+![alt 运行效果](./readme_img/github_number_result.png)
